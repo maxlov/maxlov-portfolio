@@ -1,0 +1,33 @@
+/* Design tokens. Restyle the site by editing these — components only reference variables. */
+:root {
+  /* color */
+  --color-bg: #111114;
+  --color-surface: #1b1b20;
+  --color-text: #e8e8ec;
+  --color-text-muted: #9a9aa6;
+  --color-accent: #7aa2ff;
+  --color-border: #2c2c34;
+
+  /* type */
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: var(--font-body);
+  --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 2rem;
+  --line-height: 1.6;
+
+  /* spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --space-6: 4rem;
+
+  /* layout */
+  --content-width: 72rem;
+  --prose-width: 42rem;
+  --radius: 6px;
+}

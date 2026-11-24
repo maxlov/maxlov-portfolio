@@ -1,0 +1,56 @@
+---
+import '../styles/global.css';
+import { url } from '../lib/utils';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' } = Astro.props;
+const siteName = 'Maxwell Lovell';
+const fullTitle = title === siteName ? title : `${title} · ${siteName}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+  </head>
+  <body>
+    <header class="site-header container">
+      <a class="site-name" href={url('/')}>{siteName}</a>
+      <nav>
+        <a href={url('/')}>Projects</a>
+        <a href={url('/devlogs/')}>Devlog</a>
+      </nav>
+    </header>
+    <main class="container">
+      <slot />
+    </main>
+    <footer class="site-footer container muted">
+      © {new Date().getFullYear()} {siteName}
+    </footer>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: var(--space-4);
+  }
+  .site-name { font-weight: 700; color: var(--color-text); text-decoration: none; }
+  nav { display: flex; gap: var(--space-4); }
+  nav a { color: var(--color-text-muted); text-decoration: none; }
+  nav a:hover { color: var(--color-text); }
+  main { min-height: 70vh; padding-bottom: var(--space-6); }
+  .site-footer { padding-block: var(--space-5); font-size: var(--text-sm); }
+</style>

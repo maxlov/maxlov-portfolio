@@ -1,0 +1,31 @@
+---
+interface Props {
+  videoId: string;
+  title?: string;
+}
+
+const { videoId, title = 'Video' } = Astro.props;
+// youtube-nocookie avoids setting tracking cookies until the visitor presses play
+const src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}`;
+---
+
+<div class="video">
+  <iframe
+    src={src}
+    title={title}
+    loading="lazy"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen></iframe>
+</div>
+
+<style>
+  .video {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    background: #000;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  iframe { width: 100%; height: 100%; border: 0; display: block; }
+</style>

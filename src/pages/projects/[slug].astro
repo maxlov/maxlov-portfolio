@@ -1,0 +1,81 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Gallery from '../../components/Gallery.astro';
+import VideoEmbed from '../../components/VideoEmbed.astro';
+import PlatformBadge from '../../components/PlatformBadge.astro';
+import { formatDate, url } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const { title, summary, coverImage, gallery, itchUrl, steamUrl, tags, videoId, date } = project.data;
+const { Content } = await render(project);
+
+const devlogs = (await getCollection('devlogs', (d) => d.data.project.id === project.id)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<BaseLayout title={title} description={summary}>
+  <article>
+    <header class="header">
+      <h1>{title}</h1>
+      <p class="muted">{summary}</p>
+      <p class="muted meta"><time datetime={date.toISOString()}>{formatDate(date)}</time></p>
+      {tags.length > 0 && <ul class="tags">{tags.map((t) => <li>{t}</li>)}</ul>}
+      {
+        (itchUrl || steamUrl) && (
+          <div class="badges">
+            {itchUrl && <PlatformBadge platform="itch" href={itchUrl} />}
+            {steamUrl && <PlatformBadge platform="steam" href={steamUrl} />}
+          </div>
+        )
+      }
+    </header>
+
+    {videoId ? <VideoEmbed videoId={videoId} title={title} /> : <Image src={coverImage} alt="" class="cover" />}
+
+    <div class="prose content"><Content /></div>
+
+    {
+      gallery.length > 0 && (
+        <section>
+          <h2>Gallery</h2>
+          <Gallery images={gallery} title={title} />
+        </section>
+      )
+    }
+
+    {
+      devlogs.length > 0 && (
+        <section>
+          <h2>Devlog</h2>
+          <ul class="devlogs">
+            {devlogs.map((entry) => (
+              <li>
+                <time class="muted" datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
+                <a href={url(`/devlogs/${entry.id}/`)}>{entry.data.title}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  .header { padding-block: var(--space-5) var(--space-4); }
+  .meta { font-size: var(--text-sm); }
+  .badges { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); }
+  .cover { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius); }
+  .content { padding-block: var(--space-4); }
+  section { margin-top: var(--space-5); }
+  .devlogs { list-style: none; padding: 0; display: grid; gap: var(--space-2); }
+  .devlogs time { display: inline-block; min-width: 8rem; font-size: var(--text-sm); }
+</style>

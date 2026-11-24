@@ -1,0 +1,36 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, url } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('devlogs');
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const project = await getEntry(entry.data.project);
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={entry.data.title}>
+  <article class="prose">
+    <header class="header">
+      <p class="muted meta">
+        <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
+        {' · '}
+        <a href={url(`/projects/${project.id}/`)}>{project.data.title}</a>
+      </p>
+      <h1>{entry.data.title}</h1>
+      {entry.data.tags.length > 0 && <ul class="tags">{entry.data.tags.map((t) => <li>{t}</li>)}</ul>}
+    </header>
+    <Content />
+    <p class="back"><a href={url('/devlogs/')}>← All devlog entries</a></p>
+  </article>
+</BaseLayout>
+
+<style>
+  .header { padding-block: var(--space-5) var(--space-3); }
+  .meta { font-size: var(--text-sm); margin: 0 0 var(--space-2); }
+  .back { margin-top: var(--space-5); }
+</style>

@@ -1,0 +1,44 @@
+---
+import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  images: ImageMetadata[];
+  title: string;
+}
+
+const { images, title } = Astro.props;
+// Each thumbnail links to a full-size optimized copy.
+const full = await Promise.all(images.map((src) => getImage({ src, width: 1920 })));
+---
+
+{
+  images.length > 0 && (
+    <ul class="gallery">
+      {images.map((src, i) => (
+        <li>
+          <a href={full[i]!.src} target="_blank" rel="noopener">
+            <Image src={src} alt={`${title} screenshot ${i + 1}`} widths={[400, 800]} sizes="(min-width: 48rem) 50vw, 100vw" />
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .gallery {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: var(--space-3);
+  }
+  .gallery img {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    width: 100%;
+    border-radius: var(--radius);
+  }
+</style>
