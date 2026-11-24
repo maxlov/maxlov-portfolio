@@ -4,6 +4,12 @@ import { z } from 'astro/zod';
 
 // Markdown lives in src/content/{projects,devlogs}/ so an Obsidian vault can point there.
 // Image paths in frontmatter are relative to the .md file, e.g. ./assets/my-game/cover.png
+// Optional fields may be left blank (`itchUrl:`) — Obsidian templates do that, and YAML reads it as null.
+
+const optional = <T extends z.ZodType>(schema: T) =>
+  schema.nullish().transform((v) => v ?? undefined);
+const list = <T extends z.ZodType>(item: T) =>
+  z.array(item).nullish().transform((v) => v ?? []);
 
 const projects = defineCollection({
   // The `slug` frontmatter field becomes the entry id (and the URL: /projects/<slug>/)
@@ -14,13 +20,13 @@ const projects = defineCollection({
       slug: z.string(),
       summary: z.string(),
       coverImage: image(),
-      gallery: z.array(image()).default([]),
-      itchUrl: z.url().optional(),
-      steamUrl: z.url().optional(),
-      tags: z.array(z.string()).default([]),
-      videoId: z.string().optional(), // YouTube video ID, e.g. dQw4w9WgXcQ
+      gallery: list(image()),
+      itchUrl: optional(z.url()),
+      steamUrl: optional(z.url()),
+      tags: list(z.string()),
+      videoId: optional(z.string()), // YouTube video ID, e.g. dQw4w9WgXcQ
       date: z.coerce.date(),
-      featured: z.boolean().default(false),
+      featured: z.boolean().nullish().transform((v) => v ?? false),
     }),
 });
 
@@ -30,7 +36,7 @@ const devlogs = defineCollection({
     title: z.string(),
     date: z.coerce.date(),
     project: reference('projects'), // must match an existing project slug — build fails otherwise
-    tags: z.array(z.string()).default([]),
+    tags: list(z.string()),
   }),
 });
 
